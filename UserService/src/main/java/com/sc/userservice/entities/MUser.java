@@ -6,11 +6,11 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Table(name = "micro_users")
 @Getter
 @Setter
 @Entity
 @Builder
-@Table(name = "micro_users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class MUser {
