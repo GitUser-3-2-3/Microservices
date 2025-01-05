@@ -26,5 +26,5 @@ public class Hotel {
     private String location;
 
     @Column(name = "about")
-    private String aboutUser;
+    private String aboutHotel;
 }
