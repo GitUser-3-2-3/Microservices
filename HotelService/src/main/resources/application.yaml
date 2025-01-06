@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/microservices
+    url: jdbc:postgresql://localhost:5432/hotelservice
     username: postgres
     password: Qwerty1,0*
 
