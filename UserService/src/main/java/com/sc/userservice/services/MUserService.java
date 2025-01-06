@@ -45,7 +45,15 @@ public class MUserService implements IMUserService {
 
     @Override
     public List<MUser> getAllUser() {
-        return userRepository.findAll();
+        List<MUser> userList = userRepository.findAll();
+
+        return userList.stream().peek(user -> {
+            MUser userObj = userRepository.findById(user.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User id " + user.getUserId() + " invalid."));
+            List<Rating> response = getRatings(userObj);
+
+            userObj.setRatings(response);
+        }).toList();
     }
 
     @Override
@@ -68,7 +76,7 @@ public class MUserService implements IMUserService {
         return ratingList.stream().peek(rating -> {
             Hotel hotel = restTemplate.getForObject(hotelServiceUrl + rating.getHotelId(), Hotel.class);
             rating.setHotel(hotel);
-            logger.info("Hotel set for rating::{}", rating);
+            logger.info("Hotel set for rating::\n{}", rating);
         }).toList();
     }
 }
