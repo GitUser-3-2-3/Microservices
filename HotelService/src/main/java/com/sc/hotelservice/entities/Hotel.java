@@ -1,10 +1,10 @@
 package com.sc.hotelservice.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "hotels")
 @Getter
@@ -27,4 +27,7 @@ public class Hotel {
 
     @Column(name = "about")
     private String aboutHotel;
+
+    @Transient
+    private List<Rating> ratings = new ArrayList<>();
 }

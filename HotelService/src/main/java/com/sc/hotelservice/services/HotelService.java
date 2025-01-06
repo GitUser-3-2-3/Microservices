@@ -1,7 +1,9 @@
 package com.sc.hotelservice.services;
 
 import com.sc.hotelservice.entities.Hotel;
+import com.sc.hotelservice.entities.Rating;
 import com.sc.hotelservice.exceptions.ResourceNotFoundException;
+import com.sc.hotelservice.external.services.IRatingService;
 import com.sc.hotelservice.repositories.HotelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,12 @@ import java.util.UUID;
 public class HotelService implements IHotelService {
 
     private final HotelRepository hotelRepository;
+    private final IRatingService ratingService;
 
     @Autowired
-    public HotelService(HotelRepository hotelRepository) {
+    public HotelService(HotelRepository hotelRepository, IRatingService ratingService) {
         this.hotelRepository = hotelRepository;
+        this.ratingService = ratingService;
     }
 
     @Override
@@ -28,12 +32,24 @@ public class HotelService implements IHotelService {
 
     @Override
     public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll();
+        List<Hotel> hotelList = hotelRepository.findAll();
+
+        return hotelList.stream().peek(hotel -> {
+            Hotel hotelObj = hotelRepository.findById(hotel.getHotelId())
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel id [" + hotel.getHotelId() + "] invalid."));
+            List<Rating> ratings = ratingService.getAllRatings(hotelObj.getHotelId());
+
+            hotelObj.setRatings(ratings);
+        }).toList();
     }
 
     @Override
     public Hotel getHotel(String hotelId) {
-        return hotelRepository.findById(hotelId)
-            .orElseThrow(() -> new ResourceNotFoundException("Hotel with given id::" + hotelId + " doesn't exist."));
+        Hotel hotelObj = hotelRepository.findById(hotelId)
+            .orElseThrow(() -> new ResourceNotFoundException("Hotel id [" + hotelId + "] invalid."));
+        List<Rating> ratings = ratingService.getAllRatings(hotelObj.getHotelId());
+
+        hotelObj.setRatings(ratings);
+        return hotelObj;
     }
 }
