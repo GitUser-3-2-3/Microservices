@@ -30,7 +30,7 @@ public class MUserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<MUser> getUser(@PathVariable String userId) {
-        MUser user = userService.getUser(userId);
+        MUser user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
     }
 

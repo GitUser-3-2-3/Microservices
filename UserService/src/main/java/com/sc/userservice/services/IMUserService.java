@@ -10,5 +10,5 @@ public interface IMUserService {
 
     List<MUser> getAllUser();
 
-    MUser getUser(String userId);
+    MUser getUserById(String userId);
 }

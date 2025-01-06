@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: USER_SERVICE
+    name: USER-SERVICE
   datasource:
     url: jdbc:mysql://localhost:3306/microservices
     username: root
@@ -22,3 +22,16 @@ eureka:
     register-with-eureka: true
     service-url:
       defaultZone: http://localhost:8671/eureka
+
+# Custom configs
+ratings:
+  service:
+    url: http://RATING-SERVICE/ratings/users/
+
+hotel:
+  service:
+    url: http://HOTEL-SERVICE/hotels/
+
+logging:
+  level:
+    root: info

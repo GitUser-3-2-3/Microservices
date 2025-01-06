@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: HOTEL_SERVICE
+    name: HOTEL-SERVICE
   datasource:
     url: jdbc:postgresql://localhost:5432/hotelservice
     username: postgres

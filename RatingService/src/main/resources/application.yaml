@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: RATING_SERVICE
+    name: RATING-SERVICE
   datasource:
     url: jdbc:postgresql://localhost:5432/ratingservice
     username: postgres
