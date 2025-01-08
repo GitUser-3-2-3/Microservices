@@ -8,7 +8,7 @@ public interface IMUserService {
 
     MUser saveUser(MUser user);
 
-    List<MUser> getAllUser(boolean includeHotel);
+    List<MUser> getAllUser();
 
     MUser getUserById(String userId, boolean includeHotel);
 }

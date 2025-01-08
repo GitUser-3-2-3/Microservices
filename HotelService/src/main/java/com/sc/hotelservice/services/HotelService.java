@@ -31,23 +31,21 @@ public class HotelService implements IHotelService {
     }
 
     @Override
-    public List<Hotel> getAllHotels() {
-        List<Hotel> hotelList = hotelRepository.findAll();
+    public List<Hotel> getAllHotels(boolean includeUsers) {
+        final List<Hotel> hotelList = hotelRepository.findAll();
 
-        return hotelList.stream().peek(hotel -> {
-            Hotel hotelObj = hotelRepository.findById(hotel.getHotelId())
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel id [" + hotel.getHotelId() + "] invalid."));
-            List<Rating> ratings = ratingService.getAllRatings(hotelObj.getHotelId());
-
-            hotelObj.setRatings(ratings);
-        }).toList();
+        for (Hotel hotel : hotelList) {
+            List<Rating> ratingList = getRatings(hotel.getHotelId(), includeUsers);
+            hotel.setRatings(ratingList);
+        }
+        return hotelList;
     }
 
     @Override
-    public Hotel getHotel(String hotelId) {
+    public Hotel getHotelById(String hotelId) {
         Hotel hotelObj = hotelRepository.findById(hotelId)
             .orElseThrow(() -> new ResourceNotFoundException("Hotel id [" + hotelId + "] invalid."));
-        List<Rating> ratings = ratingService.getAllRatings(hotelObj.getHotelId());
+        List<Rating> ratings = ratingService.getRatingsByHotelId(hotelObj.getHotelId());
 
         hotelObj.setRatings(ratings);
         return hotelObj;

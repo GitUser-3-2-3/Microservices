@@ -36,10 +36,8 @@ public class MUserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MUser>> getAllUsers(
-        @RequestParam(defaultValue = "false") boolean includeHotel)
-    {
-        List<MUser> userList = userService.getAllUser(includeHotel);
+    public ResponseEntity<List<MUser>> getAllUsers() {
+        List<MUser> userList = userService.getAllUser();
         return ResponseEntity.ok(userList);
     }
 }

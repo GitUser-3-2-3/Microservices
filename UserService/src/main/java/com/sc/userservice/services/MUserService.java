@@ -36,11 +36,11 @@ public class MUserService implements IMUserService {
     }
 
     @Override
-    public List<MUser> getAllUser(boolean includeHotel) {
+    public List<MUser> getAllUser() {
         final List<MUser> userList = userRepository.findAll();
 
         for (MUser userobj : userList) {
-            List<Rating> ratingList = getRatings(userobj.getUserId(), includeHotel);
+            List<Rating> ratingList = getRatings(userobj.getUserId());
             userobj.setRatings(ratingList);
         }
         /*
@@ -65,12 +65,22 @@ public class MUserService implements IMUserService {
         return userObj;
     }
 
+    private List<Rating> getRatings(final String userId) {
+        final List<Rating> ratingList = ratingService.getRatingsByUserId(userId);
+
+        for (Rating rating : ratingList) {
+            Hotel hotel = hotelService.getHotelById(rating.getHotelId());
+            rating.setHotel(hotel);
+        }
+        return ratingList;
+    }
+
     private List<Rating> getRatings(final String userId, boolean includeHotel) {
         final List<Rating> ratingList = ratingService.getRatingsByUserId(userId);
 
         if (includeHotel) {
             for (Rating rating : ratingList) {
-                Hotel hotel = hotelService.getHotel(rating.getHotelId());
+                Hotel hotel = hotelService.getHotelById(rating.getHotelId());
                 rating.setHotel(hotel);
             }
         }
