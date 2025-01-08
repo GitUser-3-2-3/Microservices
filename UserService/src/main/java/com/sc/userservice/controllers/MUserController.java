@@ -29,14 +29,16 @@ public class MUserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<MUser> getUser(@PathVariable String userId) {
-        MUser user = userService.getUserById(userId);
+    public ResponseEntity<MUser> getUser(
+        @PathVariable String userId, @RequestParam(defaultValue = "false") boolean includeHotel) {
+        MUser user = userService.getUserById(userId, includeHotel);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping
-    public ResponseEntity<List<MUser>> getAllUsers() {
-        List<MUser> userList = userService.getAllUser();
+    public ResponseEntity<List<MUser>> getAllUsers(
+        @RequestParam(defaultValue = "false") boolean includeHotel) {
+        List<MUser> userList = userService.getAllUser(includeHotel);
         return ResponseEntity.ok(userList);
     }
 }

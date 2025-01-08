@@ -10,9 +10,8 @@ import lombok.*;
 public class Rating {
 
     private String ratingId;
-    private String userId;
+    private int rating;
     private String hotelId;
     private Hotel hotel;
-    private int rating;
     private String feedback;
 }

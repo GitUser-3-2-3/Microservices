@@ -4,36 +4,28 @@ import com.sc.userservice.entities.Hotel;
 import com.sc.userservice.entities.MUser;
 import com.sc.userservice.entities.Rating;
 import com.sc.userservice.exceptions.ResourceNotFoundException;
+import com.sc.userservice.external.services.IHotelService;
+import com.sc.userservice.external.services.IRatingService;
 import com.sc.userservice.repositories.MUserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class MUserService implements IMUserService {
 
-    private final Logger logger = LoggerFactory.getLogger(MUserService.class);
-
     private final MUserRepository userRepository;
-    private final RestTemplate restTemplate;
-    private final String ratingServiceUrl;
-    private final String hotelServiceUrl;
+    private final IRatingService ratingService;
+    private final IHotelService hotelService;
 
     @Autowired
-    public MUserService(MUserRepository userRepository, RestTemplate restTemplate,
-                        @Value("${ratings.service.url}") String ratingServiceUrl,
-                        @Value("${hotel.service.url}") String hotelServiceUrl) {
+    public MUserService(
+        MUserRepository userRepository, IRatingService ratingService, IHotelService hotelService) {
         this.userRepository = userRepository;
-        this.restTemplate = restTemplate;
-        this.ratingServiceUrl = ratingServiceUrl;
-        this.hotelServiceUrl = hotelServiceUrl;
+        this.ratingService = ratingService;
+        this.hotelService = hotelService;
     }
 
     @Override
@@ -44,9 +36,14 @@ public class MUserService implements IMUserService {
     }
 
     @Override
-    public List<MUser> getAllUser() {
-        List<MUser> userList = userRepository.findAll();
+    public List<MUser> getAllUser(boolean includeHotel) {
+        final List<MUser> userList = userRepository.findAll();
 
+        for (MUser userobj : userList) {
+            List<Rating> ratingList = getRatings(userobj.getUserId(), includeHotel);
+            userobj.setRatings(ratingList);
+        }
+        /*
         return userList.stream().peek(user -> {
             MUser userObj = userRepository.findById(user.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User id " + user.getUserId() + " invalid."));
@@ -54,19 +51,30 @@ public class MUserService implements IMUserService {
 
             userObj.setRatings(response);
         }).toList();
+         */
+        return userList;
     }
 
     @Override
-    public MUser getUserById(String userId) {
+    public MUser getUserById(String userId, boolean includeHotel) {
         MUser userObj = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User id " + userId + " invalid."));
-        List<Rating> response = getRatings(userObj);
 
+        List<Rating> response = getRatings(userObj.getUserId(), includeHotel);
         userObj.setRatings(response);
         return userObj;
     }
 
-    private List<Rating> getRatings(MUser userObject) {
+    private List<Rating> getRatings(final String userId, boolean includeHotel) {
+        final List<Rating> ratingList = ratingService.getRatingsByUserId(userId);
+
+        if (includeHotel) {
+            for (Rating rating : ratingList) {
+                Hotel hotel = hotelService.getHotel(rating.getHotelId());
+                rating.setHotel(hotel);
+            }
+        }
+        /*
         Rating[] ratings = restTemplate
             .getForObject(ratingServiceUrl + userObject.getUserId(), Rating[].class);
         assert ratings != null;
@@ -78,5 +86,7 @@ public class MUserService implements IMUserService {
             rating.setHotel(hotel);
             logger.info("Hotel set for rating::\n{}", rating);
         }).toList();
+         */
+        return ratingList;
     }
 }
