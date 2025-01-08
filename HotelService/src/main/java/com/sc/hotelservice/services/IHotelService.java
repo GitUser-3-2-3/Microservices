@@ -8,7 +8,7 @@ public interface IHotelService {
 
     Hotel createHotel(Hotel hotel);
 
-    List<Hotel> getAllHotels();
+    List<Hotel> getAllHotels(boolean includeUsers);
 
-    Hotel getHotel(String hotelId);
+    Hotel getHotelById(String hotelId);
 }

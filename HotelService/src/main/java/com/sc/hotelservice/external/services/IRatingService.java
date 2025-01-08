@@ -11,5 +11,5 @@ import java.util.List;
 public interface IRatingService {
 
     @GetMapping("/ratings/hotels/{hotelId}")
-    List<Rating> getAllRatings(@PathVariable String hotelId);
+    List<Rating> getRatingsByHotelId(@PathVariable String hotelId);
 }

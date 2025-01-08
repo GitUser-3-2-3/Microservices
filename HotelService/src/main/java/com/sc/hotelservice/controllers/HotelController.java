@@ -35,8 +35,10 @@ public class HotelController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Hotel>> getAllHotels() {
-        List<Hotel> userList = hotelService.getAllHotels();
+    public ResponseEntity<List<Hotel>> getAllHotels(
+        @RequestParam(defaultValue = "false") boolean includeUsers)
+    {
+        List<Hotel> userList = hotelService.getAllHotels(includeUsers);
         return ResponseEntity.ok(userList);
     }
 }
