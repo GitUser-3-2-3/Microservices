@@ -15,9 +15,7 @@ spring:
     show-sql: true
 
   config:
-    import:
-      # noinspection SpringBootApplicationYaml
-      configserver: http://localhost:8085
+    import: configserver:http://localhost:8085
 
 #eureka:
 #  instance:
