@@ -7,12 +7,15 @@ import com.sc.userservice.exceptions.ResourceNotFoundException;
 import com.sc.userservice.external.services.IHotelService;
 import com.sc.userservice.external.services.IRatingService;
 import com.sc.userservice.repositories.MUserRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class MUserService implements IMUserService {
 
@@ -36,6 +39,7 @@ public class MUserService implements IMUserService {
     }
 
     @Override
+    @CircuitBreaker(name = "getAllUser", fallbackMethod = "getAllUserFallback")
     public List<MUser> getAllUser() {
         final List<MUser> userList = userRepository.findAll();
 
@@ -56,6 +60,7 @@ public class MUserService implements IMUserService {
     }
 
     @Override
+    @CircuitBreaker(name = "getUserById", fallbackMethod = "getUserByIdFallback")
     public MUser getUserById(String userId, boolean includeHotel) {
         MUser userObj = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User id " + userId + " invalid."));
@@ -98,5 +103,11 @@ public class MUserService implements IMUserService {
         }).toList();
          */
         return ratingList;
+    }
+
+    // Fallback method for circuit breaker
+    public List<Object> getAllUserFallback(Throwable thr) {
+        log.warn("Executed::Fallback, Service Down::{}", String.valueOf(thr));
+        return List.of("Either RatingService or HotelService is down!!!");
     }
 }
