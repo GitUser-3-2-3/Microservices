@@ -14,24 +14,21 @@ spring:
       ddl-auto: update
     show-sql: true
 
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:8671/eureka
+  config:
+    import:
+      # noinspection SpringBootApplicationYaml
+      configserver: http://localhost:8085
+
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://localhost:8671/eureka
 
 # Custom configs
-ratings:
-  service:
-    url: http://RATING-SERVICE/ratings/users/
-
-hotel:
-  service:
-    url: http://HOTEL-SERVICE/hotels/
-
 logging:
   level:
     root: info
