@@ -7,7 +7,7 @@ import com.sc.userservice.exceptions.ResourceNotFoundException;
 import com.sc.userservice.external.services.IHotelService;
 import com.sc.userservice.external.services.IRatingService;
 import com.sc.userservice.repositories.MUserRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,10 +38,18 @@ public class MUserService implements IMUserService {
         return userRepository.save(user);
     }
 
-    @Override
+    int count = 0;
+
+    /*
+    @Retry(name = "getAllUser", fallbackMethod = "getAllUserFallback")
     @CircuitBreaker(name = "getAllUser", fallbackMethod = "getAllUserFallback")
+     */
+    @Override
+    @RateLimiter(name = "getAllUser", fallbackMethod = "getAllUserFallback")
     public List<MUser> getAllUser() {
         final List<MUser> userList = userRepository.findAll();
+
+        log.error("RATE LIMITER PASSED::{}", ++count);
 
         for (MUser userobj : userList) {
             List<Rating> ratingList = getRatings(userobj.getUserId());
@@ -59,8 +67,12 @@ public class MUserService implements IMUserService {
         return userList;
     }
 
+    /*
+    @Retry(name = "getAllUser", fallbackMethod = "getAllUserFallback")
+    @CircuitBreaker(name = "getAllUser", fallbackMethod = "getAllUserFallback")
+     */
     @Override
-    @CircuitBreaker(name = "getUserById", fallbackMethod = "getUserByIdFallback")
+    @RateLimiter(name = "getUserById", fallbackMethod = "getUserByIdFallback")
     public MUser getUserById(String userId, boolean includeHotel) {
         MUser userObj = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User id " + userId + " invalid."));
@@ -106,8 +118,16 @@ public class MUserService implements IMUserService {
     }
 
     // Fallback method for circuit breaker
-    public List<Object> getAllUserFallback(Throwable thr) {
-        log.warn("Executed::Fallback, Service Down::{}", String.valueOf(thr));
-        return List.of("Either RatingService or HotelService is down!!!");
+
+    @SuppressWarnings("unused")
+    public List<MUser> getAllUserFallback(Throwable rtExp) {
+        log.warn("Executed::getAllUserFallback, Service Down::{}", String.valueOf(rtExp));
+        return List.of();
+    }
+
+    @SuppressWarnings("unused")
+    public MUser getUserByIdFallback(Throwable rtExp) {
+        log.warn("Executed::getUserByIdFallback, Service Down::{}", String.valueOf(rtExp));
+        return new MUser();
     }
 }

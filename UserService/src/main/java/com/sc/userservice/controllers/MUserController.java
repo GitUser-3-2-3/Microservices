@@ -29,7 +29,7 @@ public class MUserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<MUser> getUser(
+    public ResponseEntity<MUser> getUserById(
         @PathVariable String userId, @RequestParam(defaultValue = "false") boolean includeHotel) {
         MUser user = userService.getUserById(userId, includeHotel);
         return ResponseEntity.ok(user);

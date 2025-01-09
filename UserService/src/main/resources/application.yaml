@@ -39,6 +39,21 @@ management:
       show-details: always
 
 resilience4j:
+  ratelimiter:
+    instances:
+      getAllUser:
+        timeout-duration:
+          seconds: 1
+        limit-refresh-period:
+          seconds: 5
+        limit-for-period: 2
+      getUserById:
+        timeout-duration:
+          seconds: 1
+        limit-refresh-period:
+          seconds: 5
+        limit-for-period: 2
+
   circuitbreaker:
     instances:
       getAllUser:
@@ -52,6 +67,13 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 2
         sliding-window-size: 10
         sliding-window-type: count_based
+
+  retry:
+    instances:
+      getAllUser:
+        max-attempts: 3
+        wait-duration:
+          seconds: 3
 
 # Custom configs
 logging:
